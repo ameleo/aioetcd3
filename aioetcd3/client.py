@@ -1,7 +1,6 @@
-import aiogrpc
 import os
 import logging
-from aiogrpc.channel import Channel
+from grpc import aio as grpc
 from aioetcd3.kv import KV
 from aioetcd3.lease import Lease
 from aioetcd3.auth import Auth
@@ -40,8 +39,7 @@ class Client(KV, Lease, Auth, Watch, Maintenance, Cluster):
                              *, loop=None, executor=None):
         credentials = None
         if not ssl:
-            channel = aiogrpc.insecure_channel(endpoint, options=options, loop=loop, executor=executor,
-                                               standalone_pool_for_streaming=True)
+            channel = grpc.insecure_channel(endpoint, options=options)
         else:
             if default_ca:
                 ca_cert = None
@@ -74,8 +72,7 @@ class Client(KV, Lease, Auth, Watch, Maintenance, Cluster):
                                              loop=self._loop, executor=self._executor,
                                              standalone_pool_for_streaming=True)
         else:
-            channel = aiogrpc.insecure_channel(endpoint, options=self._options, loop=self._loop,
-                                               executor=self._executor, standalone_pool_for_streaming=True)
+            channel = grpc.insecure_channel(endpoint, options=self._options)
         return channel
     
     def close(self):
